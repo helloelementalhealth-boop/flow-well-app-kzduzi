@@ -126,3 +126,42 @@ export const userPreferences = pgTable('user_preferences', {
   created_at: timestamp('created_at').notNull().defaultNow(),
   updated_at: timestamp('updated_at').notNull().defaultNow(),
 });
+
+// Admin content table
+export const adminContent = pgTable('admin_content', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  page_name: text('page_name').notNull(),
+  content_type: text('content_type').notNull(), // text, image, video
+  content_key: text('content_key').notNull(),
+  content_value: text('content_value').notNull(),
+  display_order: integer('display_order').default(0),
+  is_active: boolean('is_active').default(true),
+  created_at: timestamp('created_at').notNull().defaultNow(),
+  updated_at: timestamp('updated_at').notNull().defaultNow(),
+});
+
+// Admin categories table
+export const adminCategories = pgTable('admin_categories', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  category_name: text('category_name').notNull().unique(),
+  icon_name: text('icon_name').notNull(),
+  route_path: text('route_path').notNull(),
+  display_order: integer('display_order').default(0),
+  is_active: boolean('is_active').default(true),
+  created_at: timestamp('created_at').notNull().defaultNow(),
+  updated_at: timestamp('updated_at').notNull().defaultNow(),
+});
+
+// Admin subscription plans table
+export const adminSubscriptionPlans = pgTable('admin_subscription_plans', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  plan_name: text('plan_name').notNull(),
+  plan_description: text('plan_description'),
+  price: text('price').notNull(),
+  billing_period: text('billing_period').notNull(), // monthly, yearly
+  features: text('features').notNull(), // JSON array as text
+  is_active: boolean('is_active').default(true),
+  display_order: integer('display_order').default(0),
+  created_at: timestamp('created_at').notNull().defaultNow(),
+  updated_at: timestamp('updated_at').notNull().defaultNow(),
+});

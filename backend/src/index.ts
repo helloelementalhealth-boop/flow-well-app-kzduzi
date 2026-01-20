@@ -11,6 +11,11 @@ import * as quotesRoutes from './routes/quotes.js';
 import * as themesRoutes from './routes/themes.js';
 import * as visualsRoutes from './routes/visuals.js';
 import * as preferencesRoutes from './routes/preferences.js';
+import * as adminContentRoutes from './routes/admin-content.js';
+import * as adminCategoriesRoutes from './routes/admin-categories.js';
+import * as adminSubscriptionsRoutes from './routes/admin-subscriptions.js';
+import * as adminAiRoutes from './routes/admin-ai.js';
+import * as adminUploadRoutes from './routes/admin-upload.js';
 
 // Create application with schema for full database type support
 export const app = await createApplication(schema);
@@ -30,6 +35,11 @@ quotesRoutes.register(app, app.fastify);
 themesRoutes.register(app, app.fastify);
 visualsRoutes.register(app, app.fastify);
 preferencesRoutes.register(app, app.fastify);
+adminContentRoutes.register(app, app.fastify);
+adminCategoriesRoutes.register(app, app.fastify);
+adminSubscriptionsRoutes.register(app, app.fastify);
+adminAiRoutes.register(app, app.fastify);
+adminUploadRoutes.register(app, app.fastify);
 
 await app.run();
 app.logger.info('Application running');
