@@ -57,6 +57,13 @@ export default function HomeScreen() {
       console.log('[HomeScreen] Weekly quote loaded:', quote);
     } catch (error) {
       console.error('[HomeScreen] Failed to load weekly quote:', error);
+      // Fallback quote
+      setWeeklyQuote({
+        id: 'fallback',
+        quote_text: 'Welcome to your wellness journey. Take a moment to breathe and be present.',
+        week_start_date: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+      });
     }
   };
 
@@ -64,8 +71,51 @@ export default function HomeScreen() {
     console.log('[HomeScreen] Loading movement visuals for current month');
     try {
       const visuals = await visualsApi.getRhythmVisualsByCategory('movement');
-      setMovementVisuals(visuals);
-      console.log('[HomeScreen] Movement visuals loaded:', visuals.length, 'items');
+      if (visuals && visuals.length > 0) {
+        setMovementVisuals(visuals);
+        console.log('[HomeScreen] Movement visuals loaded:', visuals.length, 'items');
+      } else {
+        // Use fallback visuals
+        console.log('[HomeScreen] No visuals from backend, using fallback images');
+        setMovementVisuals([
+          {
+            id: '1',
+            rhythm_category: 'movement',
+            rhythm_name: 'Morning Activation',
+            image_url: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80',
+            month_active: new Date().getMonth() + 1,
+            display_order: 0,
+            created_at: new Date().toISOString(),
+          },
+          {
+            id: '2',
+            rhythm_category: 'movement',
+            rhythm_name: 'Restorative Flow',
+            image_url: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=80',
+            month_active: new Date().getMonth() + 1,
+            display_order: 1,
+            created_at: new Date().toISOString(),
+          },
+          {
+            id: '3',
+            rhythm_category: 'movement',
+            rhythm_name: 'Strength Building',
+            image_url: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&q=80',
+            month_active: new Date().getMonth() + 1,
+            display_order: 2,
+            created_at: new Date().toISOString(),
+          },
+          {
+            id: '4',
+            rhythm_category: 'movement',
+            rhythm_name: 'Evening Unwinding',
+            image_url: 'https://images.unsplash.com/photo-1545389336-cf090694435e?w=800&q=80',
+            month_active: new Date().getMonth() + 1,
+            display_order: 3,
+            created_at: new Date().toISOString(),
+          },
+        ]);
+      }
     } catch (error) {
       console.error('[HomeScreen] Failed to load movement visuals:', error);
       // Fall back to default visuals
@@ -74,7 +124,7 @@ export default function HomeScreen() {
           id: '1',
           rhythm_category: 'movement',
           rhythm_name: 'Morning Activation',
-          image_url: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&q=80',
+          image_url: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80',
           month_active: new Date().getMonth() + 1,
           display_order: 0,
           created_at: new Date().toISOString(),
@@ -83,7 +133,7 @@ export default function HomeScreen() {
           id: '2',
           rhythm_category: 'movement',
           rhythm_name: 'Restorative Flow',
-          image_url: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&q=80',
+          image_url: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=80',
           month_active: new Date().getMonth() + 1,
           display_order: 1,
           created_at: new Date().toISOString(),
@@ -92,7 +142,7 @@ export default function HomeScreen() {
           id: '3',
           rhythm_category: 'movement',
           rhythm_name: 'Strength Building',
-          image_url: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&q=80',
+          image_url: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&q=80',
           month_active: new Date().getMonth() + 1,
           display_order: 2,
           created_at: new Date().toISOString(),
@@ -101,7 +151,7 @@ export default function HomeScreen() {
           id: '4',
           rhythm_category: 'movement',
           rhythm_name: 'Evening Unwinding',
-          image_url: 'https://images.unsplash.com/photo-1545389336-cf090694435e?w=400&q=80',
+          image_url: 'https://images.unsplash.com/photo-1545389336-cf090694435e?w=800&q=80',
           month_active: new Date().getMonth() + 1,
           display_order: 3,
           created_at: new Date().toISOString(),
@@ -158,7 +208,7 @@ export default function HomeScreen() {
           {/* Weekly Quote Hero Section */}
           <Animated.View entering={FadeIn.duration(600)} style={styles.heroSection}>
             <ImageBackground
-              source={{ uri: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80' }}
+              source={{ uri: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80' }}
               style={styles.heroBackground}
               imageStyle={styles.heroImage}
             >
@@ -244,7 +294,7 @@ export default function HomeScreen() {
                           <View style={styles.videoIndicator}>
                             <IconSymbol
                               ios_icon_name="play-circle"
-                              android_material_icon_name="play-circle"
+                              android_material_icon_name="play-circle-outline"
                               size={16}
                               color="#FFFFFF"
                             />

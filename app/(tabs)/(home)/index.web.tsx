@@ -9,10 +9,8 @@ import {
   useColorScheme,
   RefreshControl,
   Dimensions,
-  Platform,
-  ImageBackground,
+  Image,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
 import { colors } from '@/styles/commonStyles';
 import { dashboardApi, quotesApi, WeeklyQuote, visualsApi, RhythmVisual } from '@/utils/api';
@@ -58,7 +56,7 @@ export default function HomeScreen() {
       console.log('[HomeScreen] Weekly quote loaded:', quote);
     } catch (error) {
       console.error('[HomeScreen] Failed to load weekly quote:', error);
-      // Fallback quote
+      // Fallback quote for web
       setWeeklyQuote({
         id: 'fallback',
         quote_text: 'Welcome to your wellness journey. Take a moment to breathe and be present.',
@@ -77,7 +75,6 @@ export default function HomeScreen() {
         console.log('[HomeScreen] Movement visuals loaded:', visuals.length, 'items');
       } else {
         // Use fallback visuals
-        console.log('[HomeScreen] No visuals from backend, using fallback images');
         setMovementVisuals([
           {
             id: '1',
@@ -183,7 +180,7 @@ export default function HomeScreen() {
   }, []);
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top']}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}
@@ -200,13 +197,14 @@ export default function HomeScreen() {
           />
         }
       >
-        {/* Weekly Quote Hero Section */}
+        {/* Weekly Quote Hero Section - Web optimized */}
         <Animated.View entering={FadeIn.duration(600)} style={styles.heroSection}>
-          <ImageBackground
-            source={{ uri: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80' }}
-            style={styles.heroBackground}
-            imageStyle={styles.heroImage}
-          >
+          <View style={styles.heroBackground}>
+            <Image
+              source={{ uri: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80' }}
+              style={styles.heroImage}
+              resizeMode="cover"
+            />
             <LinearGradient
               colors={
                 colorScheme === 'dark'
@@ -215,7 +213,7 @@ export default function HomeScreen() {
               }
               style={styles.heroGradient}
             >
-              <View style={[styles.header, Platform.OS === 'android' && { paddingTop: 48 }]}>
+              <View style={styles.header}>
                 <Text style={[styles.greeting, { color: theme.textSecondary }]}>
                   {new Date().getHours() < 12 ? 'Good morning' : new Date().getHours() < 18 ? 'Good afternoon' : 'Good evening'}
                 </Text>
@@ -249,9 +247,10 @@ export default function HomeScreen() {
                 </View>
               )}
             </LinearGradient>
-          </ImageBackground>
+          </View>
         </Animated.View>
-        {/* Movement Categories */}
+
+        {/* Movement Categories - Web optimized with proper images */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: theme.text }]}>Movement</Text>
           <Text style={[styles.sectionSubtitle, { color: theme.textSecondary }]}>
@@ -274,11 +273,12 @@ export default function HomeScreen() {
                   }}
                   activeOpacity={0.8}
                 >
-                  <ImageBackground
-                    source={{ uri: visual.image_url }}
-                    style={styles.movementImage}
-                    imageStyle={styles.movementImageStyle}
-                  >
+                  <View style={styles.movementImageContainer}>
+                    <Image
+                      source={{ uri: visual.image_url }}
+                      style={styles.movementImage}
+                      resizeMode="cover"
+                    />
                     <LinearGradient
                       colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)']}
                       style={styles.movementGradient}
@@ -296,7 +296,7 @@ export default function HomeScreen() {
                         </View>
                       )}
                     </LinearGradient>
-                  </ImageBackground>
+                  </View>
                 </TouchableOpacity>
               </Animated.View>
             ))}
@@ -396,10 +396,8 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
         </View>
-
-
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -419,12 +417,20 @@ const styles = StyleSheet.create({
   heroBackground: {
     width: '100%',
     minHeight: 320,
+    position: 'relative',
   },
   heroImage: {
-    resizeMode: 'cover',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
   },
   heroGradient: {
-    flex: 1,
+    width: '100%',
+    minHeight: 320,
     paddingBottom: 32,
   },
   header: {
@@ -502,12 +508,19 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 4,
   },
-  movementImage: {
+  movementImageContainer: {
     width: '100%',
     height: '100%',
+    position: 'relative',
   },
-  movementImageStyle: {
-    resizeMode: 'cover',
+  movementImage: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
   },
   movementGradient: {
     flex: 1,
@@ -519,10 +532,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#FFFFFF',
     marginBottom: 4,
-  },
-  movementDuration: {
-    fontSize: 13,
-    color: 'rgba(255, 255, 255, 0.8)',
   },
   videoIndicator: {
     flexDirection: 'row',
