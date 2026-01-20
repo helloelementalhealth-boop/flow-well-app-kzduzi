@@ -268,3 +268,23 @@ export const dashboardApi = {
     return apiCall<any>(`/api/dashboard/overview?date=${date}`, { method: 'GET' });
   },
 };
+
+// Quotes API
+export interface WeeklyQuote {
+  id: string;
+  quote_text: string;
+  week_start_date: string;
+  created_at: string;
+}
+
+export const quotesApi = {
+  async getCurrentQuote(): Promise<WeeklyQuote> {
+    return apiCall<WeeklyQuote>('/api/quotes/current', { method: 'GET' });
+  },
+  async regenerateQuote(): Promise<WeeklyQuote> {
+    return apiCall<WeeklyQuote>('/api/quotes/regenerate', {
+      method: 'POST',
+      body: JSON.stringify({}),
+    });
+  },
+};
