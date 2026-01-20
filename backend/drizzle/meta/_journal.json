@@ -15,6 +15,13 @@
       "when": 1768927366479,
       "tag": "20260120164246_wide_spiral",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1768928585547,
+      "tag": "20260120170305_needy_omega_sentinel",
+      "breakpoints": true
     }
   ]
 }

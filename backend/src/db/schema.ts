@@ -81,3 +81,11 @@ export const wellnessGoals = pgTable('wellness_goals', {
   created_at: timestamp('created_at').notNull().defaultNow(),
   updated_at: timestamp('updated_at').notNull().defaultNow(),
 });
+
+// Weekly quotes table
+export const weeklyQuotes = pgTable('weekly_quotes', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  quote_text: text('quote_text').notNull(),
+  week_start_date: date('week_start_date').notNull(),
+  created_at: timestamp('created_at').notNull().defaultNow(),
+});

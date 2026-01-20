@@ -1,0 +1,97 @@
+import type { FastifyInstance } from 'fastify';
+import { eq } from 'drizzle-orm';
+import { weeklyQuotes } from '../db/schema.js';
+import type { App } from '../index.js';
+import { gateway } from '@specific-dev/framework';
+import { generateText } from 'ai';
+
+// Helper function to get Monday of current week
+function getMondayOfWeek(date: Date = new Date()): string {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is Sunday
+  const monday = new Date(d.setDate(diff));
+  return monday.toISOString().split('T')[0];
+}
+
+// Helper function to generate quote using AI
+async function generateQuoteWithAI(): Promise<string> {
+  const prompt =
+    'Generate a single poetic, encouraging wellness quote (2-3 sentences max) that feels warm, grounding, and aligned with holistic wellbeing. The tone should be elemental, human, and never generic or overly polished. Focus on themes like presence, rhythm, nourishment, movement, and emotional grounding.';
+
+  const { text } = await generateText({
+    model: gateway('openai/gpt-5.2'),
+    prompt,
+  });
+
+  return text;
+}
+
+export function register(app: App, fastify: FastifyInstance) {
+  // GET /api/quotes/current - Returns the current week's quote or generates a new one
+  fastify.get('/api/quotes/current', async (request, reply) => {
+    const weekStartDate = getMondayOfWeek();
+
+    app.logger.info({ weekStartDate }, 'Fetching current week quote');
+    try {
+      // Check if quote exists for this week
+      const existingQuote = await app.db
+        .select()
+        .from(weeklyQuotes)
+        .where(eq(weeklyQuotes.week_start_date, weekStartDate))
+        .limit(1);
+
+      if (existingQuote.length > 0) {
+        app.logger.info({ quoteId: existingQuote[0].id }, 'Current week quote found');
+        return existingQuote[0];
+      }
+
+      // Generate new quote
+      app.logger.info({}, 'Generating new quote for current week');
+      const quoteText = await generateQuoteWithAI();
+
+      const newQuote = await app.db
+        .insert(weeklyQuotes)
+        .values({
+          quote_text: quoteText,
+          week_start_date: weekStartDate,
+        })
+        .returning();
+
+      app.logger.info({ quoteId: newQuote[0].id }, 'New quote generated and created');
+      return newQuote[0];
+    } catch (error) {
+      app.logger.error({ err: error, weekStartDate }, 'Failed to fetch or generate quote');
+      throw error;
+    }
+  });
+
+  // POST /api/quotes/regenerate - Generates a new quote for the current week
+  fastify.post('/api/quotes/regenerate', async (request, reply) => {
+    const weekStartDate = getMondayOfWeek();
+
+    app.logger.info({ weekStartDate }, 'Regenerating quote for current week');
+    try {
+      // Delete existing quote for this week if present
+      await app.db.delete(weeklyQuotes).where(eq(weeklyQuotes.week_start_date, weekStartDate));
+
+      // Generate new quote
+      app.logger.info({}, 'Generating new quote');
+      const quoteText = await generateQuoteWithAI();
+
+      const newQuote = await app.db
+        .insert(weeklyQuotes)
+        .values({
+          quote_text: quoteText,
+          week_start_date: weekStartDate,
+        })
+        .returning();
+
+      app.logger.info({ quoteId: newQuote[0].id }, 'Quote regenerated successfully');
+      return newQuote[0];
+    } catch (error) {
+      app.logger.error({ err: error, weekStartDate }, 'Failed to regenerate quote');
+      throw error;
+    }
+  });
+}
