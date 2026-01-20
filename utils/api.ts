@@ -288,3 +288,74 @@ export const quotesApi = {
     });
   },
 };
+
+// Visual Themes API
+export interface VisualTheme {
+  id: string;
+  theme_name: string;
+  background_color: string;
+  card_color: string;
+  text_color: string;
+  text_secondary_color: string;
+  primary_color: string;
+  secondary_color: string;
+  accent_color: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+export const themesApi = {
+  async getThemes(): Promise<VisualTheme[]> {
+    return apiCall<VisualTheme[]>('/api/themes', { method: 'GET' });
+  },
+  async getTheme(id: string): Promise<VisualTheme> {
+    return apiCall<VisualTheme>(`/api/themes/${id}`, { method: 'GET' });
+  },
+};
+
+// Rhythm Visuals API
+export interface RhythmVisual {
+  id: string;
+  rhythm_category: 'movement' | 'nourishment' | 'presence' | 'reflection';
+  rhythm_name: string;
+  image_url: string;
+  video_url?: string;
+  month_active: number;
+  display_order: number;
+  created_at: string;
+}
+
+export const visualsApi = {
+  async getRhythmVisuals(): Promise<RhythmVisual[]> {
+    return apiCall<RhythmVisual[]>('/api/visuals/rhythms', { method: 'GET' });
+  },
+  async getRhythmVisualsByCategory(category: string): Promise<RhythmVisual[]> {
+    return apiCall<RhythmVisual[]>(`/api/visuals/rhythms/${category}`, { method: 'GET' });
+  },
+};
+
+// User Preferences API
+export interface UserPreferences {
+  id: string;
+  user_id: string;
+  selected_theme_id?: string;
+  auto_theme_by_time: boolean;
+  theme_details?: VisualTheme;
+  created_at: string;
+  updated_at: string;
+}
+
+export const preferencesApi = {
+  async getPreferences(): Promise<UserPreferences> {
+    return apiCall<UserPreferences>('/api/preferences', { method: 'GET' });
+  },
+  async updatePreferences(input: { selected_theme_id?: string; auto_theme_by_time?: boolean }): Promise<UserPreferences> {
+    return apiCall<UserPreferences>('/api/preferences', {
+      method: 'PUT',
+      body: JSON.stringify(input),
+    });
+  },
+  async getCurrentTheme(): Promise<VisualTheme> {
+    return apiCall<VisualTheme>('/api/preferences/current-theme', { method: 'GET' });
+  },
+};

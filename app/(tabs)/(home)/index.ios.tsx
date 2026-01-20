@@ -13,23 +13,25 @@ import {
 } from 'react-native';
 import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
 import { colors } from '@/styles/commonStyles';
-import { dashboardApi, quotesApi, WeeklyQuote } from '@/utils/api';
+import { dashboardApi, quotesApi, WeeklyQuote, visualsApi, RhythmVisual } from '@/utils/api';
 import { IconSymbol } from '@/components/IconSymbol';
 import { useRouter } from 'expo-router';
 import { Stack } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
+import { useTheme } from '@/contexts/WidgetContext';
 
 const { width } = Dimensions.get('window');
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
-  const theme = colors[colorScheme ?? 'light'];
+  const { currentTheme: theme } = useTheme();
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
   const [overview, setOverview] = useState<any>(null);
   const [weeklyQuote, setWeeklyQuote] = useState<WeeklyQuote | null>(null);
   const [loadingQuote, setLoadingQuote] = useState(false);
+  const [movementVisuals, setMovementVisuals] = useState<RhythmVisual[]>([]);
 
   const today = new Date().toISOString().split('T')[0];
 
@@ -58,6 +60,56 @@ export default function HomeScreen() {
     }
   };
 
+  const loadMovementVisuals = async () => {
+    console.log('[HomeScreen] Loading movement visuals for current month');
+    try {
+      const visuals = await visualsApi.getRhythmVisualsByCategory('movement');
+      setMovementVisuals(visuals);
+      console.log('[HomeScreen] Movement visuals loaded:', visuals.length, 'items');
+    } catch (error) {
+      console.error('[HomeScreen] Failed to load movement visuals:', error);
+      // Fall back to default visuals
+      setMovementVisuals([
+        {
+          id: '1',
+          rhythm_category: 'movement',
+          rhythm_name: 'Morning Activation',
+          image_url: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&q=80',
+          month_active: new Date().getMonth() + 1,
+          display_order: 0,
+          created_at: new Date().toISOString(),
+        },
+        {
+          id: '2',
+          rhythm_category: 'movement',
+          rhythm_name: 'Restorative Flow',
+          image_url: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&q=80',
+          month_active: new Date().getMonth() + 1,
+          display_order: 1,
+          created_at: new Date().toISOString(),
+        },
+        {
+          id: '3',
+          rhythm_category: 'movement',
+          rhythm_name: 'Strength Building',
+          image_url: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&q=80',
+          month_active: new Date().getMonth() + 1,
+          display_order: 2,
+          created_at: new Date().toISOString(),
+        },
+        {
+          id: '4',
+          rhythm_category: 'movement',
+          rhythm_name: 'Evening Unwinding',
+          image_url: 'https://images.unsplash.com/photo-1545389336-cf090694435e?w=400&q=80',
+          month_active: new Date().getMonth() + 1,
+          display_order: 3,
+          created_at: new Date().toISOString(),
+        },
+      ]);
+    }
+  };
+
   const handleRegenerateQuote = async () => {
     console.log('[HomeScreen] User tapped regenerate quote');
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -76,6 +128,7 @@ export default function HomeScreen() {
   useEffect(() => {
     loadOverview();
     loadWeeklyQuote();
+    loadMovementVisuals();
   }, []);
 
   return (
@@ -96,6 +149,7 @@ export default function HomeScreen() {
               onRefresh={() => {
                 loadOverview();
                 loadWeeklyQuote();
+                loadMovementVisuals();
               }} 
               tintColor={theme.primary} 
             />
@@ -165,101 +219,43 @@ export default function HomeScreen() {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.movementScroll}
             >
-              <TouchableOpacity
-                style={[styles.movementCard, { backgroundColor: theme.card }]}
-                onPress={() => {
-                  console.log('[HomeScreen] User tapped Morning Activation');
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  router.push('/(tabs)/fitness');
-                }}
-                activeOpacity={0.8}
-              >
-                <ImageBackground
-                  source={{ uri: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&q=80' }}
-                  style={styles.movementImage}
-                  imageStyle={styles.movementImageStyle}
-                >
-                  <LinearGradient
-                    colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)']}
-                    style={styles.movementGradient}
+              {movementVisuals.map((visual, index) => (
+                <Animated.View key={visual.id} entering={FadeInDown.delay(index * 100).duration(400)}>
+                  <TouchableOpacity
+                    style={[styles.movementCard, { backgroundColor: theme.card }]}
+                    onPress={() => {
+                      console.log('[HomeScreen] User tapped', visual.rhythm_name);
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      router.push('/(tabs)/fitness');
+                    }}
+                    activeOpacity={0.8}
                   >
-                    <Text style={styles.movementTitle}>Morning Activation</Text>
-                    <Text style={styles.movementDuration}>5-15 min</Text>
-                  </LinearGradient>
-                </ImageBackground>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[styles.movementCard, { backgroundColor: theme.card }]}
-                onPress={() => {
-                  console.log('[HomeScreen] User tapped Restorative Flow');
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  router.push('/(tabs)/fitness');
-                }}
-                activeOpacity={0.8}
-              >
-                <ImageBackground
-                  source={{ uri: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&q=80' }}
-                  style={styles.movementImage}
-                  imageStyle={styles.movementImageStyle}
-                >
-                  <LinearGradient
-                    colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)']}
-                    style={styles.movementGradient}
-                  >
-                    <Text style={styles.movementTitle}>Restorative Flow</Text>
-                    <Text style={styles.movementDuration}>10-20 min</Text>
-                  </LinearGradient>
-                </ImageBackground>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[styles.movementCard, { backgroundColor: theme.card }]}
-                onPress={() => {
-                  console.log('[HomeScreen] User tapped Strength Building');
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  router.push('/(tabs)/fitness');
-                }}
-                activeOpacity={0.8}
-              >
-                <ImageBackground
-                  source={{ uri: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&q=80' }}
-                  style={styles.movementImage}
-                  imageStyle={styles.movementImageStyle}
-                >
-                  <LinearGradient
-                    colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)']}
-                    style={styles.movementGradient}
-                  >
-                    <Text style={styles.movementTitle}>Strength Building</Text>
-                    <Text style={styles.movementDuration}>20-30 min</Text>
-                  </LinearGradient>
-                </ImageBackground>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[styles.movementCard, { backgroundColor: theme.card }]}
-                onPress={() => {
-                  console.log('[HomeScreen] User tapped Evening Unwinding');
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  router.push('/(tabs)/mindfulness');
-                }}
-                activeOpacity={0.8}
-              >
-                <ImageBackground
-                  source={{ uri: 'https://images.unsplash.com/photo-1545389336-cf090694435e?w=400&q=80' }}
-                  style={styles.movementImage}
-                  imageStyle={styles.movementImageStyle}
-                >
-                  <LinearGradient
-                    colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)']}
-                    style={styles.movementGradient}
-                  >
-                    <Text style={styles.movementTitle}>Evening Unwinding</Text>
-                    <Text style={styles.movementDuration}>5-10 min</Text>
-                  </LinearGradient>
-                </ImageBackground>
-              </TouchableOpacity>
+                    <ImageBackground
+                      source={{ uri: visual.image_url }}
+                      style={styles.movementImage}
+                      imageStyle={styles.movementImageStyle}
+                    >
+                      <LinearGradient
+                        colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)']}
+                        style={styles.movementGradient}
+                      >
+                        <Text style={styles.movementTitle}>{visual.rhythm_name}</Text>
+                        {visual.video_url && (
+                          <View style={styles.videoIndicator}>
+                            <IconSymbol
+                              ios_icon_name="play-circle"
+                              android_material_icon_name="play-circle"
+                              size={16}
+                              color="#FFFFFF"
+                            />
+                            <Text style={styles.videoText}>Video</Text>
+                          </View>
+                        )}
+                      </LinearGradient>
+                    </ImageBackground>
+                  </TouchableOpacity>
+                </Animated.View>
+              ))}
             </ScrollView>
           </View>
 
@@ -483,6 +479,17 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: 'rgba(255, 255, 255, 0.8)',
   },
+  videoIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 4,
+  },
+  videoText: {
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontWeight: '600',
+  },
   rhythmGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -514,5 +521,3 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
 });
-
-

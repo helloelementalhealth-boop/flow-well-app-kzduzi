@@ -15,11 +15,13 @@ import { colors } from '@/styles/commonStyles';
 import { activityApi, goalsApi } from '@/utils/api';
 import { IconSymbol } from '@/components/IconSymbol';
 import * as Haptics from 'expo-haptics';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
+import { useTheme } from '@/contexts/WidgetContext';
 
 export default function ProfileScreen() {
   const colorScheme = useColorScheme();
-  const theme = colors[colorScheme ?? 'light'];
+  const { currentTheme: theme } = useTheme();
+  const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
   const [activities, setActivities] = useState<any>(null);
   const [goals, setGoals] = useState<any[]>([]);
@@ -204,6 +206,34 @@ export default function ProfileScreen() {
           <Animated.View entering={FadeInDown.delay(300).duration(300)}>
             <Text style={[styles.sectionTitle, { color: theme.text }]}>Settings</Text>
             <View style={[styles.settingsCard, { backgroundColor: theme.card }]}>
+              <TouchableOpacity 
+                style={styles.settingItem} 
+                activeOpacity={0.7}
+                onPress={() => {
+                  console.log('[ProfileScreen] User tapped Visual Themes');
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  router.push('/(tabs)/theme-settings');
+                }}
+              >
+                <View style={styles.settingLeft}>
+                  <IconSymbol
+                    ios_icon_name="palette"
+                    android_material_icon_name="palette"
+                    size={20}
+                    color={theme.text}
+                  />
+                  <Text style={[styles.settingText, { color: theme.text }]}>Visual Themes</Text>
+                </View>
+                <IconSymbol
+                  ios_icon_name="chevron-right"
+                  android_material_icon_name="chevron-right"
+                  size={20}
+                  color={theme.textSecondary}
+                />
+              </TouchableOpacity>
+
+              <View style={[styles.settingDivider, { backgroundColor: theme.border }]} />
+
               <TouchableOpacity style={styles.settingItem} activeOpacity={0.7}>
                 <View style={styles.settingLeft}>
                   <IconSymbol
