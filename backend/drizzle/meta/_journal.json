@@ -8,6 +8,13 @@
       "when": 1768926815550,
       "tag": "20260120163335_steady_kingpin",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1768927366479,
+      "tag": "20260120164246_wide_spiral",
+      "breakpoints": true
     }
   ]
 }
