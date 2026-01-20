@@ -89,3 +89,40 @@ export const weeklyQuotes = pgTable('weekly_quotes', {
   week_start_date: date('week_start_date').notNull(),
   created_at: timestamp('created_at').notNull().defaultNow(),
 });
+
+// Visual themes table
+export const visualThemes = pgTable('visual_themes', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  theme_name: text('theme_name').notNull(),
+  background_color: text('background_color').notNull(),
+  card_color: text('card_color').notNull(),
+  text_color: text('text_color').notNull(),
+  text_secondary_color: text('text_secondary_color').notNull(),
+  primary_color: text('primary_color').notNull(),
+  secondary_color: text('secondary_color').notNull(),
+  accent_color: text('accent_color').notNull(),
+  is_active: boolean('is_active').default(true),
+  created_at: timestamp('created_at').notNull().defaultNow(),
+});
+
+// Rhythm visuals table
+export const rhythmVisuals = pgTable('rhythm_visuals', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  rhythm_category: text('rhythm_category').notNull(), // movement, nourishment, presence, reflection
+  rhythm_name: text('rhythm_name').notNull(),
+  image_url: text('image_url').notNull(),
+  video_url: text('video_url'),
+  month_active: integer('month_active').notNull(),
+  display_order: integer('display_order').default(0),
+  created_at: timestamp('created_at').notNull().defaultNow(),
+});
+
+// User preferences table
+export const userPreferences = pgTable('user_preferences', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  user_id: text('user_id').default('default_user'),
+  selected_theme_id: uuid('selected_theme_id').references(() => visualThemes.id),
+  auto_theme_by_time: boolean('auto_theme_by_time').default(false),
+  created_at: timestamp('created_at').notNull().defaultNow(),
+  updated_at: timestamp('updated_at').notNull().defaultNow(),
+});
