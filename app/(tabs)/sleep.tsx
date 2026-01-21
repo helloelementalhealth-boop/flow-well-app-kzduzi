@@ -156,6 +156,23 @@ export default function SleepScreen() {
             Choose what helps you unwind and prepare for rest
           </Text>
 
+          {tools.length === 0 && !refreshing ? (
+            <View style={[styles.emptyState, { backgroundColor: theme.card }]}>
+              <IconSymbol
+                ios_icon_name="bedtime"
+                android_material_icon_name="bedtime"
+                size={48}
+                color={theme.textSecondary}
+              />
+              <Text style={[styles.emptyStateTitle, { color: theme.text }]}>
+                No Sleep Tools Available
+              </Text>
+              <Text style={[styles.emptyStateText, { color: theme.textSecondary }]}>
+                Pull down to refresh and load sleep tools
+              </Text>
+            </View>
+          ) : null}
+
           <View style={styles.toolsGrid}>
             {tools.map((tool, index) => {
               const toolIcon = getToolIcon(tool.tool_type);
@@ -575,5 +592,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#FFFFFF',
+  },
+  emptyState: {
+    borderRadius: 16,
+    padding: 40,
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  emptyStateTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  emptyStateText: {
+    fontSize: 15,
+    textAlign: 'center',
+    lineHeight: 22,
   },
 });
