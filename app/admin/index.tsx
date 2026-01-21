@@ -17,62 +17,17 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Stack, useRouter } from 'expo-router';
 import { colors } from '@/styles/commonStyles';
 import { IconSymbol } from '@/components/IconSymbol';
-import { useTheme, useAdminAuth } from '@/contexts/WidgetContext';
 import * as Haptics from 'expo-haptics';
+import { useTheme, useAdminAuth } from '@/contexts/WidgetContext';
 
 export default function AdminDashboard() {
   const colorScheme = useColorScheme();
   const { currentTheme: theme } = useTheme();
   const router = useRouter();
-  const { isAdmin, isLoading, login, logout } = useAdminAuth();
-  
-  // Login form state
+  const { isAdmin, login, logout } = useAdminAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [loggingIn, setLoggingIn] = useState(false);
-
-  const adminSections = [
-    {
-      title: 'Content Management',
-      items: [
-        {
-          name: 'Content Pages',
-          icon: 'description',
-          route: '/admin/pages-manager',
-          description: 'Edit Privacy, Terms, Help & Support pages',
-        },
-        {
-          name: 'Subscriptions',
-          icon: 'card-membership',
-          route: '/admin/subscriptions',
-          description: 'Manage subscription plans and pricing',
-        },
-        {
-          name: 'Notifications',
-          icon: 'notifications',
-          route: '/admin/notifications-manager',
-          description: 'Create and schedule push notifications',
-        },
-        {
-          name: 'Visual Content',
-          icon: 'image',
-          route: '/admin/visuals',
-          description: 'Upload and manage images/videos',
-        },
-      ],
-    },
-    {
-      title: 'App Configuration',
-      items: [
-        {
-          name: 'Tab Bar Categories',
-          icon: 'category',
-          route: '/admin/categories',
-          description: 'Add or edit navigation tabs',
-        },
-      ],
-    },
-  ];
+  const [loading, setLoading] = useState(false);
 
   const handleNavigate = (route: string) => {
     console.log('[AdminDashboard] Navigating to:', route);
@@ -87,189 +42,102 @@ export default function AdminDashboard() {
     }
 
     console.log('[AdminDashboard] Attempting login');
-    setLoggingIn(true);
+    setLoading(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     try {
       const success = await login(username, password);
       if (success) {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        Alert.alert('Success', 'Welcome, Admin!');
+        Alert.alert('Success', 'Logged in as admin');
         setUsername('');
         setPassword('');
       } else {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-        Alert.alert('Error', 'Invalid credentials. Please try again.');
+        Alert.alert('Error', 'Invalid credentials');
       }
     } catch (error) {
-      console.error('[AdminDashboard] Login error:', error);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      console.error('[AdminDashboard] Login failed:', error);
       Alert.alert('Error', 'Login failed. Please try again.');
     } finally {
-      setLoggingIn(false);
+      setLoading(false);
     }
   };
 
   const handleLogout = async () => {
-    Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Logout',
-          style: 'destructive',
-          onPress: async () => {
-            console.log('[AdminDashboard] Logging out');
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-            await logout();
-            Alert.alert('Success', 'You have been logged out');
-          },
-        },
-      ]
-    );
+    console.log('[AdminDashboard] Logging out');
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    await logout();
+    Alert.alert('Success', 'Logged out successfully');
   };
 
-  // Show loading state while checking authentication
-  if (isLoading) {
-    return (
-      <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top']}>
-        <Stack.Screen
-          options={{
-            headerShown: true,
-            title: 'Admin Control',
-            headerStyle: { backgroundColor: theme.background },
-            headerTintColor: theme.text,
-            headerShadowVisible: false,
-          }}
-        />
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={theme.primary} />
-          <Text style={[styles.loadingText, { color: theme.textSecondary }]}>
-            Checking authentication...
-          </Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
+  const adminSections = [
+    {
+      title: 'Content Management',
+      items: [
+        {
+          icon: 'category',
+          label: 'Categories',
+          description: 'Manage app categories',
+          route: '/admin/categories',
+        },
+        {
+          icon: 'description',
+          label: 'Pages',
+          description: 'Edit privacy, terms, help pages',
+          route: '/admin/pages-manager',
+        },
+        {
+          icon: 'palette',
+          label: 'Visuals',
+          description: 'Manage themes and visuals',
+          route: '/admin/visuals',
+        },
+      ],
+    },
+    {
+      title: 'Premium Features',
+      items: [
+        {
+          icon: 'star',
+          label: 'Subscriptions',
+          description: 'Manage subscription plans',
+          route: '/admin/subscriptions',
+        },
+        {
+          icon: 'bedtime',
+          label: 'Sleep Tools',
+          description: 'Manage sleep tools and premium content',
+          route: '/admin/sleep-tools',
+        },
+      ],
+    },
+    {
+      title: 'User Engagement',
+      items: [
+        {
+          icon: 'notifications',
+          label: 'Notifications',
+          description: 'Manage push notifications',
+          route: '/admin/notifications-manager',
+        },
+      ],
+    },
+  ];
 
-  // Show login form if not authenticated
-  if (!isAdmin) {
-    return (
-      <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top']}>
-        <Stack.Screen
-          options={{
-            headerShown: true,
-            title: 'Login',
-            headerStyle: { backgroundColor: theme.background },
-            headerTintColor: theme.text,
-            headerShadowVisible: false,
-          }}
-        />
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.loginContent}
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={[styles.loginCard, { backgroundColor: theme.card }]}>
-            <View style={[styles.lockIcon, { backgroundColor: theme.primary + '20' }]}>
-              <IconSymbol
-                ios_icon_name="lock"
-                android_material_icon_name="lock"
-                size={48}
-                color={theme.primary}
-              />
-            </View>
-            <Text style={[styles.loginTitle, { color: theme.text }]}>Admin Access Required</Text>
-            <Text style={[styles.loginSubtitle, { color: theme.textSecondary }]}>
-              Please login with your admin credentials to access the control panel
-            </Text>
-
-            <View style={styles.loginForm}>
-              <Text style={[styles.inputLabel, { color: theme.text }]}>Username</Text>
-              <TextInput
-                style={[styles.input, { backgroundColor: theme.background, color: theme.text, borderColor: theme.border }]}
-                value={username}
-                onChangeText={setUsername}
-                placeholder="Enter username"
-                placeholderTextColor={theme.textSecondary}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-
-              <Text style={[styles.inputLabel, { color: theme.text }]}>Password</Text>
-              <TextInput
-                style={[styles.input, { backgroundColor: theme.background, color: theme.text, borderColor: theme.border }]}
-                value={password}
-                onChangeText={setPassword}
-                placeholder="Enter password"
-                placeholderTextColor={theme.textSecondary}
-                secureTextEntry
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-
-              <TouchableOpacity
-                style={[styles.loginButton, { backgroundColor: theme.primary }]}
-                onPress={handleLogin}
-                disabled={loggingIn}
-                activeOpacity={0.8}
-              >
-                {loggingIn ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : (
-                  <>
-                    <IconSymbol
-                      ios_icon_name="login"
-                      android_material_icon_name="login"
-                      size={20}
-                      color="#FFFFFF"
-                    />
-                    <Text style={styles.loginButtonText}>Login</Text>
-                  </>
-                )}
-              </TouchableOpacity>
-            </View>
-
-            <View style={[styles.infoBox, { backgroundColor: theme.primary + '10' }]}>
-              <IconSymbol
-                ios_icon_name="info"
-                android_material_icon_name="info"
-                size={16}
-                color={theme.primary}
-              />
-              <Text style={[styles.infoText, { color: theme.textSecondary }]}>
-                Default credentials: admin / admin123
-              </Text>
-            </View>
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    );
-  }
+  const loginTitle = 'Admin Login';
+  const usernameLabel = 'Username';
+  const passwordLabel = 'Password';
+  const loginButtonText = 'Login';
+  const dashboardTitle = 'Admin Dashboard';
+  const logoutButtonText = 'Logout';
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top']}>
       <Stack.Screen
         options={{
           headerShown: true,
-          title: 'Admin Control',
+          title: isAdmin ? 'Admin' : 'Login',
           headerStyle: { backgroundColor: theme.background },
           headerTintColor: theme.text,
-          headerShadowVisible: false,
-          headerRight: () => (
-            <TouchableOpacity
-              onPress={handleLogout}
-              style={{ marginRight: 16 }}
-            >
-              <IconSymbol
-                ios_icon_name="logout"
-                android_material_icon_name="logout"
-                size={24}
-                color={theme.error}
-              />
-            </TouchableOpacity>
-          ),
         }}
       />
 
@@ -278,72 +146,154 @@ export default function AdminDashboard() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <View style={[styles.header, Platform.OS === 'android' && { paddingTop: 16 }]}>
-          <Text style={[styles.title, { color: theme.text }]}>Admin Control</Text>
-          <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
-            Manage your app content with AI assistance
-          </Text>
-        </View>
+        {!isAdmin ? (
+          // Login Form
+          <View style={[styles.loginContainer, Platform.OS === 'android' && { paddingTop: 48 }]}>
+            <View style={[styles.loginCard, { backgroundColor: theme.card }]}>
+              <View style={[styles.iconContainer, { backgroundColor: theme.primary + '20' }]}>
+                <IconSymbol
+                  ios_icon_name="lock"
+                  android_material_icon_name="lock"
+                  size={48}
+                  color={theme.primary}
+                />
+              </View>
+              <Text style={[styles.loginTitle, { color: theme.text }]}>
+                {loginTitle}
+              </Text>
+              <Text style={[styles.loginSubtitle, { color: theme.textSecondary }]}>
+                Enter your credentials to access admin features
+              </Text>
 
-        {adminSections.map((section, sectionIndex) => (
-          <Animated.View
-            key={section.title}
-            entering={FadeInDown.delay(sectionIndex * 100).duration(300)}
-            style={styles.section}
-          >
-            <Text style={[styles.sectionTitle, { color: theme.text }]}>{section.title}</Text>
-            <View style={[styles.sectionCard, { backgroundColor: theme.card }]}>
-              {section.items.map((item, itemIndex) => (
-                <React.Fragment key={item.name}>
-                  {itemIndex > 0 && (
-                    <View style={[styles.divider, { backgroundColor: theme.border }]} />
-                  )}
-                  <TouchableOpacity
-                    style={styles.adminItem}
-                    onPress={() => handleNavigate(item.route)}
-                    activeOpacity={0.7}
-                  >
-                    <View style={[styles.iconContainer, { backgroundColor: theme.primary + '20' }]}>
-                      <IconSymbol
-                        ios_icon_name={item.icon}
-                        android_material_icon_name={item.icon}
-                        size={24}
-                        color={theme.primary}
-                      />
-                    </View>
-                    <View style={styles.itemContent}>
-                      <Text style={[styles.itemName, { color: theme.text }]}>{item.name}</Text>
-                      <Text style={[styles.itemDescription, { color: theme.textSecondary }]}>
-                        {item.description}
-                      </Text>
-                    </View>
+              <View style={styles.inputContainer}>
+                <Text style={[styles.inputLabel, { color: theme.text }]}>
+                  {usernameLabel}
+                </Text>
+                <TextInput
+                  style={[styles.input, { backgroundColor: theme.background, color: theme.text }]}
+                  value={username}
+                  onChangeText={setUsername}
+                  placeholder="Enter username"
+                  placeholderTextColor={theme.textSecondary}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
+              </View>
+
+              <View style={styles.inputContainer}>
+                <Text style={[styles.inputLabel, { color: theme.text }]}>
+                  {passwordLabel}
+                </Text>
+                <TextInput
+                  style={[styles.input, { backgroundColor: theme.background, color: theme.text }]}
+                  value={password}
+                  onChangeText={setPassword}
+                  placeholder="Enter password"
+                  placeholderTextColor={theme.textSecondary}
+                  secureTextEntry
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
+              </View>
+
+              <TouchableOpacity
+                style={[styles.loginButton, { backgroundColor: theme.primary }]}
+                onPress={handleLogin}
+                disabled={loading}
+                activeOpacity={0.8}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#FFFFFF" />
+                ) : (
+                  <>
                     <IconSymbol
-                      ios_icon_name="chevron-right"
-                      android_material_icon_name="chevron-right"
+                      ios_icon_name="login"
+                      android_material_icon_name="login"
                       size={20}
-                      color={theme.textSecondary}
+                      color="#FFFFFF"
                     />
-                  </TouchableOpacity>
-                </React.Fragment>
-              ))}
+                    <Text style={styles.loginButtonText}>{loginButtonText}</Text>
+                  </>
+                )}
+              </TouchableOpacity>
             </View>
-          </Animated.View>
-        ))}
-
-        <View style={[styles.infoCard, { backgroundColor: theme.card }]}>
-          <IconSymbol
-            ios_icon_name="info"
-            android_material_icon_name="info"
-            size={24}
-            color={theme.primary}
-          />
-          <View style={styles.infoContent}>
-            <Text style={[styles.infoTitle, { color: theme.text }]}>AI-Powered Editing</Text>
-            <Text style={[styles.infoText, { color: theme.textSecondary }]}>
-              Use AI assistance to generate and improve content throughout the admin panel. Look for the ✨ icon.
-            </Text>
           </View>
-        </View>
+        ) : (
+          // Admin Dashboard
+          <View style={[Platform.OS === 'android' && { paddingTop: 48 }]}>
+            <View style={styles.header}>
+              <Text style={[styles.title, { color: theme.text }]}>
+                {dashboardTitle}
+              </Text>
+              <TouchableOpacity
+                style={[styles.logoutButton, { backgroundColor: theme.error + '20' }]}
+                onPress={handleLogout}
+                activeOpacity={0.8}
+              >
+                <IconSymbol
+                  ios_icon_name="logout"
+                  android_material_icon_name="logout"
+                  size={18}
+                  color={theme.error}
+                />
+                <Text style={[styles.logoutButtonText, { color: theme.error }]}>
+                  {logoutButtonText}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {adminSections.map((section, sectionIndex) => (
+              <View key={section.title} style={styles.section}>
+                <Text style={[styles.sectionTitle, { color: theme.text }]}>
+                  {section.title}
+                </Text>
+                <View style={[styles.sectionCard, { backgroundColor: theme.card }]}>
+                  {section.items.map((item, itemIndex) => (
+                    <React.Fragment key={item.route}>
+                      <Animated.View
+                        entering={FadeInDown.delay((sectionIndex * 100) + (itemIndex * 50)).duration(300)}
+                      >
+                        <TouchableOpacity
+                          style={styles.menuItem}
+                          onPress={() => handleNavigate(item.route)}
+                          activeOpacity={0.7}
+                        >
+                          <View style={styles.menuItemLeft}>
+                            <View style={[styles.menuIcon, { backgroundColor: theme.primary + '20' }]}>
+                              <IconSymbol
+                                ios_icon_name={item.icon}
+                                android_material_icon_name={item.icon}
+                                size={24}
+                                color={theme.primary}
+                              />
+                            </View>
+                            <View style={styles.menuTextContainer}>
+                              <Text style={[styles.menuLabel, { color: theme.text }]}>
+                                {item.label}
+                              </Text>
+                              <Text style={[styles.menuDescription, { color: theme.textSecondary }]}>
+                                {item.description}
+                              </Text>
+                            </View>
+                          </View>
+                          <IconSymbol
+                            ios_icon_name="chevron-right"
+                            android_material_icon_name="chevron-right"
+                            size={20}
+                            color={theme.textSecondary}
+                          />
+                        </TouchableOpacity>
+                      </Animated.View>
+                      {itemIndex < section.items.length - 1 && (
+                        <View style={[styles.divider, { backgroundColor: theme.border }]} />
+                      )}
+                    </React.Fragment>
+                  ))}
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
 
         <View style={{ height: 100 }} />
       </ScrollView>
@@ -355,28 +305,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 16,
-  },
-  loadingText: {
-    fontSize: 16,
-  },
   scrollView: {
     flex: 1,
   },
   content: {
     paddingHorizontal: 24,
   },
-  loginContent: {
-    paddingHorizontal: 24,
-    paddingTop: 40,
-    paddingBottom: 40,
+  loginContainer: {
+    paddingTop: 60,
   },
   loginCard: {
-    borderRadius: 24,
+    borderRadius: 20,
     padding: 32,
     alignItems: 'center',
     shadowOffset: { width: 0, height: 4 },
@@ -384,7 +323,7 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 4,
   },
-  lockIcon: {
+  iconContainer: {
     width: 96,
     height: 96,
     borderRadius: 48,
@@ -393,31 +332,30 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   loginTitle: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: '700',
     marginBottom: 8,
-    textAlign: 'center',
   },
   loginSubtitle: {
     fontSize: 15,
-    lineHeight: 22,
     textAlign: 'center',
+    lineHeight: 22,
     marginBottom: 32,
   },
-  loginForm: {
+  inputContainer: {
     width: '100%',
-    gap: 16,
+    marginBottom: 20,
   },
   inputLabel: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '600',
-    marginBottom: -8,
+    marginBottom: 8,
   },
   input: {
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
-    borderWidth: 1,
+    width: '100%',
   },
   loginButton: {
     flexDirection: 'row',
@@ -425,6 +363,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 16,
     borderRadius: 12,
+    width: '100%',
     marginTop: 8,
     gap: 8,
   },
@@ -433,31 +372,29 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  infoBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 24,
-  },
-  infoText: {
-    fontSize: 13,
-    flex: 1,
-  },
   header: {
-    paddingTop: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 16,
     paddingBottom: 24,
   },
   title: {
     fontSize: 32,
     fontWeight: '700',
     letterSpacing: -0.5,
-    marginBottom: 8,
   },
-  subtitle: {
-    fontSize: 16,
-    lineHeight: 22,
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 12,
+    gap: 6,
+  },
+  logoutButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
   },
   section: {
     marginBottom: 32,
@@ -465,7 +402,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: '600',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   sectionCard: {
     borderRadius: 16,
@@ -475,53 +412,40 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
-  adminItem: {
+  menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingVertical: 16,
     paddingHorizontal: 16,
-    gap: 12,
   },
-  iconContainer: {
+  menuItemLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    gap: 16,
+  },
+  menuIcon: {
     width: 48,
     height: 48,
     borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  itemContent: {
+  menuTextContainer: {
     flex: 1,
   },
-  itemName: {
-    fontSize: 16,
+  menuLabel: {
+    fontSize: 17,
     fontWeight: '600',
     marginBottom: 4,
   },
-  itemDescription: {
-    fontSize: 13,
-    lineHeight: 18,
+  menuDescription: {
+    fontSize: 14,
+    lineHeight: 20,
   },
   divider: {
     height: 1,
     marginHorizontal: 16,
-  },
-  infoCard: {
-    flexDirection: 'row',
-    padding: 16,
-    borderRadius: 16,
-    gap: 12,
-    marginTop: 8,
-  },
-  infoContent: {
-    flex: 1,
-  },
-  infoTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  infoText: {
-    fontSize: 13,
-    lineHeight: 18,
   },
 });
