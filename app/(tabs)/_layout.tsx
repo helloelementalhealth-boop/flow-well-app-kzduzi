@@ -12,16 +12,16 @@ export default function TabLayout() {
       label: 'Home',
     },
     {
-      name: 'nutrition',
-      route: '/(tabs)/nutrition',
-      icon: 'restaurant',
-      label: 'Nutrition',
+      name: 'nourishment',
+      route: '/(tabs)/nourishment',
+      icon: 'water-drop',
+      label: 'Nourishment',
     },
     {
-      name: 'fitness',
-      route: '/(tabs)/fitness',
-      icon: 'fitness-center',
-      label: 'Fitness',
+      name: 'movement',
+      route: '/(tabs)/movement',
+      icon: 'autorenew',
+      label: 'Movement',
     },
     {
       name: 'mindfulness',
@@ -53,8 +53,8 @@ export default function TabLayout() {
       >
         <Stack.Screen key="home" name="(home)" />
         <Stack.Screen key="history" name="(history)" />
-        <Stack.Screen key="nutrition" name="nutrition" />
-        <Stack.Screen key="fitness" name="fitness" />
+        <Stack.Screen key="nourishment" name="nourishment" />
+        <Stack.Screen key="movement" name="movement" />
         <Stack.Screen key="mindfulness" name="mindfulness" />
         <Stack.Screen key="sleep" name="sleep" />
         <Stack.Screen key="profile" name="profile" />

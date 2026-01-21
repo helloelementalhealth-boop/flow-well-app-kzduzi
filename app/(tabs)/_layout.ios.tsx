@@ -9,13 +9,13 @@ export default function TabLayout() {
         <Label>Home</Label>
         <Icon sf={{ default: 'house', selected: 'house.fill' }} drawable="home" />
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="nutrition">
-        <Label>Nutrition</Label>
-        <Icon sf={{ default: 'fork.knife', selected: 'fork.knife.circle.fill' }} drawable="restaurant" />
+      <NativeTabs.Trigger name="nourishment">
+        <Label>Nourishment</Label>
+        <Icon sf={{ default: 'drop', selected: 'drop.fill' }} drawable="water-drop" />
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="fitness">
-        <Label>Fitness</Label>
-        <Icon sf={{ default: 'figure.walk', selected: 'figure.run' }} drawable="fitness-center" />
+      <NativeTabs.Trigger name="movement">
+        <Label>Movement</Label>
+        <Icon sf={{ default: 'arrow.triangle.2.circlepath', selected: 'arrow.triangle.2.circlepath.circle.fill' }} drawable="autorenew" />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="mindfulness">
         <Label>Mindfulness</Label>
