@@ -1,5 +1,6 @@
+
 import "react-native-reanimated";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -21,7 +22,7 @@ import { WidgetProvider, ThemeProvider as CustomThemeProvider, AdminAuthProvider
 SplashScreen.preventAutoHideAsync();
 
 export const unstable_settings = {
-  initialRouteName: "(tabs)", // Ensure any route can link back to `/`
+  initialRouteName: "opening", // Start with opening animation
 };
 
 export default function RootLayout() {
@@ -88,8 +89,12 @@ export default function RootLayout() {
               <WidgetProvider>
                 <GestureHandlerRootView>
                 <Stack>
+                  {/* Opening animation screen */}
+                  <Stack.Screen name="opening" options={{ headerShown: false }} />
                   {/* Main app with tabs */}
                   <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                  {/* Admin screens */}
+                  <Stack.Screen name="admin" options={{ headerShown: false }} />
                 </Stack>
                 <SystemBars style={"auto"} />
                 </GestureHandlerRootView>

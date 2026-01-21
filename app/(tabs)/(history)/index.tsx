@@ -16,7 +16,6 @@ import { colors, moodColors } from '@/styles/commonStyles';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { journalApi, JournalEntry } from '@/utils/api';
 import * as Haptics from 'expo-haptics';
-import AnimatedHello from '@/components/AnimatedHello';
 
 const moods: { [key: string]: { label: string; emoji: string } } = {
   calm: { label: 'Calm', emoji: '🌊' },
@@ -115,12 +114,16 @@ export default function HistoryScreen() {
     });
   };
 
+  const loadingText = 'Loading your journal...';
+  const emptyTitle = 'No Journal Entries Yet';
+  const emptyMessage = 'Start your wellness journey by creating your first journal entry.';
+
   if (isLoading) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top']}>
         <View style={styles.centerContainer}>
           <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
-            Loading your journal...
+            {loadingText}
           </Text>
         </View>
       </SafeAreaView>
@@ -131,7 +134,12 @@ export default function HistoryScreen() {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top']}>
         <View style={styles.centerContainer}>
-          <AnimatedHello color={theme.text} secondaryColor={theme.textSecondary} />
+          <Text style={[styles.emptyTitle, { color: theme.text }]}>
+            {emptyTitle}
+          </Text>
+          <Text style={[styles.emptyMessage, { color: theme.textSecondary }]}>
+            {emptyMessage}
+          </Text>
         </View>
       </SafeAreaView>
     );
@@ -291,10 +299,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
   },
+  emptyTitle: {
+    fontSize: 24,
+    fontWeight: '600',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
   emptyText: {
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 8,
+    textAlign: 'center',
+  },
+  emptyMessage: {
+    fontSize: 16,
+    lineHeight: 24,
     textAlign: 'center',
   },
   entryContainer: {
