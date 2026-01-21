@@ -66,6 +66,24 @@ export default function ProfileScreen() {
     );
   };
 
+  const handlePrivacy = () => {
+    console.log('[ProfileScreen] User tapped Privacy Policy');
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    Alert.alert('Privacy Policy', 'Your privacy is important to us. We protect your data and never share it without your consent.');
+  };
+
+  const handleTerms = () => {
+    console.log('[ProfileScreen] User tapped Terms of Service');
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    Alert.alert('Terms of Service', 'By using Eluminate, you agree to our terms and conditions.');
+  };
+
+  const handleHelp = () => {
+    console.log('[ProfileScreen] User tapped Help & Support');
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    Alert.alert('Help & Support', 'Need assistance? Contact us at support@eluminate.app');
+  };
+
   const ActivityCard = ({
     icon,
     label,
@@ -114,6 +132,12 @@ export default function ProfileScreen() {
   const settingsTitle = 'Settings';
   const adminControlText = 'Admin Control';
   const adminDescriptionText = 'Manage app content and settings';
+  const privacyText = 'Privacy Policy';
+  const privacyDescriptionText = 'How we protect your data';
+  const termsText = 'Terms of Service';
+  const termsDescriptionText = 'Our terms and conditions';
+  const helpText = 'Help & Support';
+  const helpDescriptionText = 'Get assistance and answers';
 
   return (
     <>
@@ -252,6 +276,106 @@ export default function ProfileScreen() {
               </TouchableOpacity>
 
               <View style={[styles.divider, { backgroundColor: theme.border }]} />
+
+              <TouchableOpacity
+                style={styles.settingItem}
+                onPress={handlePrivacy}
+                activeOpacity={0.7}
+              >
+                <View style={styles.settingLeft}>
+                  <View style={[styles.settingIcon, { backgroundColor: theme.info + '20' }]}>
+                    <IconSymbol
+                      ios_icon_name="lock"
+                      android_material_icon_name="lock"
+                      size={20}
+                      color={theme.info}
+                    />
+                  </View>
+                  <View style={styles.settingTextContainer}>
+                    <Text style={[styles.settingLabel, { color: theme.text }]}>
+                      {privacyText}
+                    </Text>
+                    <Text style={[styles.settingDescription, { color: theme.textSecondary }]}>
+                      {privacyDescriptionText}
+                    </Text>
+                  </View>
+                </View>
+                <IconSymbol
+                  ios_icon_name="chevron-right"
+                  android_material_icon_name="chevron-right"
+                  size={20}
+                  color={theme.textSecondary}
+                />
+              </TouchableOpacity>
+
+              <View style={[styles.divider, { backgroundColor: theme.border }]} />
+
+              <TouchableOpacity
+                style={styles.settingItem}
+                onPress={handleTerms}
+                activeOpacity={0.7}
+              >
+                <View style={styles.settingLeft}>
+                  <View style={[styles.settingIcon, { backgroundColor: theme.warning + '20' }]}>
+                    <IconSymbol
+                      ios_icon_name="description"
+                      android_material_icon_name="description"
+                      size={20}
+                      color={theme.warning}
+                    />
+                  </View>
+                  <View style={styles.settingTextContainer}>
+                    <Text style={[styles.settingLabel, { color: theme.text }]}>
+                      {termsText}
+                    </Text>
+                    <Text style={[styles.settingDescription, { color: theme.textSecondary }]}>
+                      {termsDescriptionText}
+                    </Text>
+                  </View>
+                </View>
+                <IconSymbol
+                  ios_icon_name="chevron-right"
+                  android_material_icon_name="chevron-right"
+                  size={20}
+                  color={theme.textSecondary}
+                />
+              </TouchableOpacity>
+
+              <View style={[styles.divider, { backgroundColor: theme.border }]} />
+
+              <TouchableOpacity
+                style={styles.settingItem}
+                onPress={handleHelp}
+                activeOpacity={0.7}
+              >
+                <View style={styles.settingLeft}>
+                  <View style={[styles.settingIcon, { backgroundColor: theme.success + '20' }]}>
+                    <IconSymbol
+                      ios_icon_name="help"
+                      android_material_icon_name="help"
+                      size={20}
+                      color={theme.success}
+                    />
+                  </View>
+                  <View style={styles.settingTextContainer}>
+                    <Text style={[styles.settingLabel, { color: theme.text }]}>
+                      {helpText}
+                    </Text>
+                    <Text style={[styles.settingDescription, { color: theme.textSecondary }]}>
+                      {helpDescriptionText}
+                    </Text>
+                  </View>
+                </View>
+                <IconSymbol
+                  ios_icon_name="chevron-right"
+                  android_material_icon_name="chevron-right"
+                  size={20}
+                  color={theme.textSecondary}
+                />
+              </TouchableOpacity>
+
+              <View style={[styles.divider, { backgroundColor: theme.border }]} />
+
               <TouchableOpacity
                 style={styles.settingItem}
                 onPress={() => {
