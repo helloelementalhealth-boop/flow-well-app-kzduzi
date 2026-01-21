@@ -13,14 +13,14 @@ export default function OpeningScreen() {
   useEffect(() => {
     console.log('[OpeningScreen] Eluminate animation started');
     
-    // Navigate to main app after animation completes (4 seconds total animation time - slowed down from 2.4s)
+    // Navigate to main app after animation completes (4240ms total: 2000ms pathway + 640ms letters + 600ms subtitle)
     const timer = setTimeout(() => {
       if (!hasNavigated) {
         console.log('[OpeningScreen] Animation complete, navigating to home');
         setHasNavigated(true);
         router.replace('/(tabs)/(home)/');
       }
-    }, 4000);
+    }, 4240);
 
     return () => {
       clearTimeout(timer);

@@ -19,8 +19,10 @@ import { colors, practiceColors } from '@/styles/commonStyles';
 import { meditationApi, PracticeType, MeditationSession } from '@/utils/api';
 import { IconSymbol } from '@/components/IconSymbol';
 import * as Haptics from 'expo-haptics';
+import { useRouter } from 'expo-router';
 
 export default function MindfulnessScreen() {
+  const router = useRouter();
   const colorScheme = useColorScheme();
   const theme = colors[colorScheme ?? 'light'];
   const [refreshing, setRefreshing] = useState(false);
@@ -35,7 +37,7 @@ export default function MindfulnessScreen() {
 
   const today = new Date().toISOString().split('T')[0];
 
-  const loadData = React.useCallback(async () => {
+  const loadData = async () => {
     console.log('[MindfulnessScreen] Loading meditation data');
     setRefreshing(true);
     try {
@@ -51,11 +53,11 @@ export default function MindfulnessScreen() {
     } finally {
       setRefreshing(false);
     }
-  }, [today]);
+  };
 
   useEffect(() => {
     loadData();
-  }, [loadData]);
+  }, []);
 
   const handleAddSession = async () => {
     if (!duration) {
@@ -139,9 +141,43 @@ export default function MindfulnessScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={loadData} tintColor={theme.primary} />
         }
       >
-        {/* Stats Card */}
+        {/* Journal Prompt Card */}
         <Animated.View
           entering={FadeInDown.duration(300)}
+          style={[styles.journalPromptCard, { backgroundColor: theme.primary + '15', borderColor: theme.primary + '30' }]}
+        >
+          <View style={styles.journalPromptContent}>
+            <View style={styles.journalPromptTextContainer}>
+              <Text style={[styles.journalPromptTitle, { color: theme.text }]}>
+                Reflect on your journey
+              </Text>
+              <Text style={[styles.journalPromptSubtitle, { color: theme.textSecondary }]}>
+                Capture your thoughts and insights
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => {
+                console.log('[MindfulnessScreen] Navigating to journal');
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push('/(tabs)/(history)/new-entry');
+              }}
+              style={[styles.journalPromptButton, { backgroundColor: theme.primary }]}
+              activeOpacity={0.8}
+            >
+              <IconSymbol
+                ios_icon_name="edit"
+                android_material_icon_name="edit"
+                size={20}
+                color="#FFFFFF"
+              />
+              <Text style={styles.journalPromptButtonText}>Journal</Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+
+        {/* Stats Card */}
+        <Animated.View
+          entering={FadeInDown.delay(50).duration(300)}
           style={[styles.statsCard, { backgroundColor: theme.card }]}
         >
           <Text style={[styles.statsTitle, { color: theme.text }]}>Your Practice</Text>
@@ -380,6 +416,43 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 24,
+  },
+  journalPromptCard: {
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    borderWidth: 1,
+  },
+  journalPromptContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  journalPromptTextContainer: {
+    flex: 1,
+    marginRight: 16,
+  },
+  journalPromptTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  journalPromptSubtitle: {
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  journalPromptButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 12,
+    gap: 6,
+  },
+  journalPromptButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
   },
   statsCard: {
     borderRadius: 16,
