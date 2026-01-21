@@ -6,15 +6,18 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
-  useColorScheme,
   RefreshControl,
   Alert,
 } from 'react-native';
-import { Stack } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, moodColors } from '@/styles/commonStyles';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { journalApi, JournalEntry } from '@/utils/api';
+import { IconSymbol } from '@/components/IconSymbol';
+import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
+import { useTheme } from '@/contexts/WidgetContext';
+import { Stack } from 'expo-router';
 
 const moods: { [key: string]: { label: string; emoji: string } } = {
   calm: { label: 'Calm', emoji: '🌊' },
@@ -26,9 +29,9 @@ const moods: { [key: string]: { label: string; emoji: string } } = {
 };
 
 export default function HistoryScreen() {
-  console.log('HistoryScreen (iOS): Rendering journal history');
-  const scheme = useColorScheme();
-  const theme = scheme === 'dark' ? colors.dark : colors.light;
+  console.log('HistoryScreen: Rendering journal history');
+  const { currentTheme: theme } = useTheme();
+  const router = useRouter();
 
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -114,8 +117,9 @@ export default function HistoryScreen() {
   };
 
   const loadingText = 'Loading your journal...';
-  const emptyTitle = 'No Journal Entries Yet';
-  const emptyMessage = 'Start your wellness journey by creating your first journal entry.';
+  const emptyTitle = 'Begin Your Reflection Journey';
+  const emptyMessage = 'Your journal is a sacred space for self-discovery. Start by creating your first entry and explore your inner landscape.';
+  const newEntryButtonText = 'New Entry';
 
   if (isLoading) {
     return (
@@ -123,22 +127,20 @@ export default function HistoryScreen() {
         <Stack.Screen
           options={{
             headerShown: true,
+            title: 'Reflection',
             headerLargeTitle: true,
-            headerTitle: 'History',
-            headerTransparent: false,
-            headerBlurEffect: scheme === 'dark' ? 'dark' : 'light',
-            headerStyle: {
-              backgroundColor: theme.background,
-            },
+            headerStyle: { backgroundColor: theme.background },
+            headerTintColor: theme.text,
+            headerShadowVisible: false,
           }}
         />
-        <View style={[styles.container, { backgroundColor: theme.background }]}>
+        <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['bottom']}>
           <View style={styles.centerContainer}>
             <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
               {loadingText}
             </Text>
           </View>
-        </View>
+        </SafeAreaView>
       </>
     );
   }
@@ -149,25 +151,48 @@ export default function HistoryScreen() {
         <Stack.Screen
           options={{
             headerShown: true,
+            title: 'Reflection',
             headerLargeTitle: true,
-            headerTitle: 'History',
-            headerTransparent: false,
-            headerBlurEffect: scheme === 'dark' ? 'dark' : 'light',
-            headerStyle: {
-              backgroundColor: theme.background,
-            },
+            headerStyle: { backgroundColor: theme.background },
+            headerTintColor: theme.text,
+            headerShadowVisible: false,
           }}
         />
-        <View style={[styles.container, { backgroundColor: theme.background }]}>
+        <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['bottom']}>
           <View style={styles.centerContainer}>
+            <View style={[styles.emptyIcon, { backgroundColor: theme.primary + '20' }]}>
+              <IconSymbol
+                ios_icon_name="book"
+                android_material_icon_name="book"
+                size={48}
+                color={theme.primary}
+              />
+            </View>
             <Text style={[styles.emptyTitle, { color: theme.text }]}>
               {emptyTitle}
             </Text>
             <Text style={[styles.emptyMessage, { color: theme.textSecondary }]}>
               {emptyMessage}
             </Text>
+            <TouchableOpacity
+              style={[styles.newEntryButton, { backgroundColor: theme.primary }]}
+              onPress={() => {
+                console.log('[HistoryScreen] User tapped New Entry from empty state');
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                router.push('/(tabs)/(history)/new-entry');
+              }}
+              activeOpacity={0.8}
+            >
+              <IconSymbol
+                ios_icon_name="add"
+                android_material_icon_name="add"
+                size={20}
+                color="#FFFFFF"
+              />
+              <Text style={styles.newEntryButtonText}>{newEntryButtonText}</Text>
+            </TouchableOpacity>
           </View>
-        </View>
+        </SafeAreaView>
       </>
     );
   }
@@ -177,16 +202,31 @@ export default function HistoryScreen() {
       <Stack.Screen
         options={{
           headerShown: true,
+          title: 'Reflection',
           headerLargeTitle: true,
-          headerTitle: 'History',
-          headerTransparent: false,
-          headerBlurEffect: scheme === 'dark' ? 'dark' : 'light',
-          headerStyle: {
-            backgroundColor: theme.background,
-          },
+          headerStyle: { backgroundColor: theme.background },
+          headerTintColor: theme.text,
+          headerShadowVisible: false,
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => {
+                console.log('[HistoryScreen] User tapped New Entry');
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                router.push('/(tabs)/(history)/new-entry');
+              }}
+              style={{ marginRight: 16 }}
+            >
+              <IconSymbol
+                ios_icon_name="add"
+                android_material_icon_name="add"
+                size={28}
+                color={theme.primary}
+              />
+            </TouchableOpacity>
+          ),
         }}
       />
-      <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['bottom']}>
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
@@ -199,13 +239,6 @@ export default function HistoryScreen() {
             />
           }
         >
-          {/* Subtitle */}
-          <View style={styles.header}>
-            <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
-              {entries.length} {entries.length === 1 ? 'entry' : 'entries'}
-            </Text>
-          </View>
-
           {/* Entries List */}
           {entries.map((entry, index) => {
             const isExpanded = expandedId === entry.id;
@@ -272,7 +305,7 @@ export default function HistoryScreen() {
                   {entry.intention && (
                     <View style={[styles.intentionContainer, { backgroundColor: theme.background }]}>
                       <Text style={[styles.intentionLabel, { color: theme.textSecondary }]}>
-                        INTENTION:
+                        Intention:
                       </Text>
                       <Text style={[styles.intentionText, { color: theme.text }]}>
                         {entry.intention}
@@ -293,16 +326,21 @@ export default function HistoryScreen() {
                   onPress={() => handleDelete(entry.id)}
                   style={[styles.deleteButton, { backgroundColor: theme.card }]}
                 >
-                  <Text style={styles.deleteButtonText}>🗑️</Text>
+                  <IconSymbol
+                    ios_icon_name="delete"
+                    android_material_icon_name="delete"
+                    size={20}
+                    color={theme.error}
+                  />
                 </TouchableOpacity>
               </Animated.View>
             );
           })}
 
-          {/* Bottom spacing */}
-          <View style={{ height: 40 }} />
+          {/* Bottom spacing for tab bar */}
+          <View style={{ height: 100 }} />
         </ScrollView>
-      </View>
+      </SafeAreaView>
     </>
   );
 }
@@ -317,19 +355,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 40,
   },
+  emptyIcon: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 24,
+  },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     paddingHorizontal: 20,
-    paddingTop: 8,
-  },
-  header: {
-    marginBottom: 16,
-  },
-  subtitle: {
-    fontSize: 16,
-    lineHeight: 24,
+    paddingTop: 16,
   },
   emptyTitle: {
     fontSize: 24,
@@ -347,6 +386,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     textAlign: 'center',
+    marginBottom: 32,
+  },
+  newEntryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    borderRadius: 24,
+    gap: 8,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  newEntryButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
   entryContainer: {
     marginBottom: 16,
@@ -409,6 +466,7 @@ const styles = StyleSheet.create({
   intentionLabel: {
     fontSize: 12,
     fontWeight: '600',
+    textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 4,
   },
@@ -430,8 +488,9 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  deleteButtonText: {
-    fontSize: 18,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
 });
