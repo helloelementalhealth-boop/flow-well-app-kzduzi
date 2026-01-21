@@ -1,5 +1,5 @@
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -24,7 +24,13 @@ const acronym = [
 ];
 
 export default function AnimatedHello({ color, secondaryColor }: AnimatedHelloProps) {
-  // Create all animated values at the component level (not in callbacks)
+  // Butterfly wing animation values
+  const leftWingRotation = useSharedValue(0);
+  const rightWingRotation = useSharedValue(0);
+  const butterflyOpacity = useSharedValue(1);
+  const butterflyScale = useSharedValue(1);
+
+  // Letter animation values
   const letterOpacity0 = useSharedValue(0);
   const letterOpacity1 = useSharedValue(0);
   const letterOpacity2 = useSharedValue(0);
@@ -55,10 +61,34 @@ export default function AnimatedHello({ color, secondaryColor }: AnimatedHelloPr
   const wordTranslateXs = [wordTranslateX0, wordTranslateX1, wordTranslateX2, wordTranslateX3, wordTranslateX4];
 
   useEffect(() => {
-    // Animate letters first
+    console.log('AnimatedHello: Starting butterfly wings unfolding animation');
+    
+    // Butterfly wings unfold animation (1200ms total)
+    leftWingRotation.value = withSequence(
+      withTiming(-90, { duration: 600 }),
+      withSpring(-70, { damping: 8, stiffness: 80 })
+    );
+    
+    rightWingRotation.value = withSequence(
+      withTiming(90, { duration: 600 }),
+      withSpring(70, { damping: 8, stiffness: 80 })
+    );
+
+    // Butterfly fades out after unfolding
+    butterflyOpacity.value = withDelay(
+      1200,
+      withTiming(0, { duration: 400 })
+    );
+
+    butterflyScale.value = withDelay(
+      1200,
+      withTiming(1.2, { duration: 400 })
+    );
+
+    // Animate letters after butterfly animation (starting at 1600ms)
     letterOpacities.forEach((opacity, index) => {
       opacity.value = withDelay(
-        index * 150,
+        1600 + index * 150,
         withSequence(
           withSpring(1, {
             damping: 12,
@@ -71,7 +101,7 @@ export default function AnimatedHello({ color, secondaryColor }: AnimatedHelloPr
 
     letterScales.forEach((scale, index) => {
       scale.value = withDelay(
-        index * 150,
+        1600 + index * 150,
         withSequence(
           withSpring(1, {
             damping: 12,
@@ -86,20 +116,37 @@ export default function AnimatedHello({ color, secondaryColor }: AnimatedHelloPr
     // Then animate words
     wordOpacities.forEach((opacity, index) => {
       opacity.value = withDelay(
-        index * 150 + 300,
+        1600 + index * 150 + 300,
         withTiming(1, { duration: 600 })
       );
     });
 
     wordTranslateXs.forEach((translateX, index) => {
       translateX.value = withDelay(
-        index * 150 + 300,
+        1600 + index * 150 + 300,
         withTiming(0, { duration: 600 })
       );
     });
   }, []);
 
-  // Create animated styles at component level
+  // Butterfly wing animated styles
+  const leftWingStyle = useAnimatedStyle(() => ({
+    opacity: butterflyOpacity.value,
+    transform: [
+      { rotateY: `${leftWingRotation.value}deg` },
+      { scale: butterflyScale.value },
+    ],
+  }));
+
+  const rightWingStyle = useAnimatedStyle(() => ({
+    opacity: butterflyOpacity.value,
+    transform: [
+      { rotateY: `${rightWingRotation.value}deg` },
+      { scale: butterflyScale.value },
+    ],
+  }));
+
+  // Letter animated styles
   const letterStyle0 = useAnimatedStyle(() => ({
     opacity: letterOpacity0.value,
     transform: [
@@ -170,6 +217,14 @@ export default function AnimatedHello({ color, secondaryColor }: AnimatedHelloPr
 
   return (
     <View style={styles.container}>
+      {/* Butterfly Wings Animation */}
+      <View style={styles.butterflyContainer}>
+        <Animated.View style={[styles.wing, styles.leftWing, { backgroundColor: color }, leftWingStyle]} />
+        <View style={[styles.butterflyBody, { backgroundColor: color }]} />
+        <Animated.View style={[styles.wing, styles.rightWing, { backgroundColor: color }, rightWingStyle]} />
+      </View>
+
+      {/* HELLO Acronym */}
       <View style={styles.helloContainer}>
         {acronym.map((item, index) => (
           <View key={index} style={styles.row}>
@@ -193,6 +248,42 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     paddingVertical: 60,
+  },
+  butterflyContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 80,
+    marginBottom: 40,
+  },
+  wing: {
+    width: 50,
+    height: 70,
+    borderRadius: 25,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  leftWing: {
+    borderTopLeftRadius: 35,
+    borderBottomLeftRadius: 35,
+    borderTopRightRadius: 15,
+    borderBottomRightRadius: 15,
+    marginRight: 4,
+  },
+  rightWing: {
+    borderTopRightRadius: 35,
+    borderBottomRightRadius: 35,
+    borderTopLeftRadius: 15,
+    borderBottomLeftRadius: 15,
+    marginLeft: 4,
+  },
+  butterflyBody: {
+    width: 8,
+    height: 60,
+    borderRadius: 4,
   },
   helloContainer: {
     marginBottom: 24,
