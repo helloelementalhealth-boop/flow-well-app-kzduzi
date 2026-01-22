@@ -39,15 +39,24 @@ export default function WellnessProgramsScreen() {
     console.log('[WellnessPrograms] Loading programs and enrollments');
     setRefreshing(true);
     try {
-      const [programsData, enrollmentsData] = await Promise.all([
-        wellnessApi.getPrograms(),
-        wellnessApi.getEnrollments(),
-      ]);
+      // Load programs first (this works without auth)
+      const programsData = await wellnessApi.getPrograms();
       setPrograms(programsData);
-      setEnrollments(enrollmentsData);
-      console.log('[WellnessPrograms] Loaded:', programsData.length, 'programs,', enrollmentsData.length, 'enrollments');
+      console.log('[WellnessPrograms] Loaded programs:', programsData.length);
+
+      // Try to load enrollments, but handle auth errors gracefully
+      try {
+        const enrollmentsData = await wellnessApi.getEnrollments();
+        setEnrollments(enrollmentsData);
+        console.log('[WellnessPrograms] Loaded enrollments:', enrollmentsData.length);
+      } catch (enrollmentError: any) {
+        // If enrollments fail due to auth (401), just set empty array
+        // This allows the page to still show programs
+        console.log('[WellnessPrograms] Enrollments not available (auth required):', enrollmentError?.message || 'Unknown error');
+        setEnrollments([]);
+      }
     } catch (error) {
-      console.error('[WellnessPrograms] Failed to load data:', error);
+      console.error('[WellnessPrograms] Failed to load programs:', error);
       setPrograms([]);
       setEnrollments([]);
     } finally {
