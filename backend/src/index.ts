@@ -21,6 +21,7 @@ import * as adminAuthRoutes from './routes/admin-auth.js';
 import * as sleepToolsRoutes from './routes/sleep-tools.js';
 import * as wellnessProgramsRoutes from './routes/wellness-programs.js';
 import * as wellnessEnrollmentsRoutes from './routes/wellness-enrollments.js';
+import * as insightsRoutes from './routes/insights.js';
 
 // Combine schemas
 const schema = { ...appSchema, ...authSchema };
@@ -55,6 +56,7 @@ adminAuthRoutes.register(app, app.fastify);
 sleepToolsRoutes.register(app, app.fastify);
 wellnessProgramsRoutes.register(app, app.fastify);
 wellnessEnrollmentsRoutes.register(app, app.fastify);
+insightsRoutes.register(app, app.fastify);
 
 await app.run();
 app.logger.info('Application running');

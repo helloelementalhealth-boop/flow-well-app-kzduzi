@@ -205,3 +205,25 @@ export const programEnrollments = pgTable('program_enrollments', {
   completed_at: timestamp('completed_at'),
 });
 
+// Program analytics table
+export const programAnalytics = pgTable('program_analytics', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  program_id: uuid('program_id').notNull().references(() => wellnessPrograms.id),
+  date: date('date').notNull(),
+  active_users: integer('active_users').default(0),
+  completions: integer('completions').default(0),
+  created_at: timestamp('created_at').notNull().defaultNow(),
+});
+
+// Community insights table
+export const communityInsights = pgTable('community_insights', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  insight_type: text('insight_type').notNull(), // tip, stat, recommendation
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  is_active: boolean('is_active').default(true),
+  display_order: integer('display_order').default(0),
+  created_at: timestamp('created_at').notNull().defaultNow(),
+  updated_at: timestamp('updated_at').notNull().defaultNow(),
+});
+
