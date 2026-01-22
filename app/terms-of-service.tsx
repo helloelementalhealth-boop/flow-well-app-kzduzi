@@ -58,7 +58,7 @@ export default function TermsOfServiceScreen() {
     },
     {
       title: 'Contact Information',
-      content: 'For questions about these Terms of Service, please contact us at legal@eluminate.app. We are committed to addressing your concerns and maintaining transparent communication.',
+      content: 'For questions about these Terms of Service, please contact us at eluminate.co@gmail.com. We are committed to addressing your concerns and maintaining transparent communication.',
     },
   ];
 

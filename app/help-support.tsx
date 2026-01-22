@@ -23,7 +23,7 @@ export default function HelpSupportScreen() {
   const handleContactEmail = () => {
     console.log('[HelpSupport] User tapped email support');
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Linking.openURL('mailto:support@eluminate.app?subject=Support Request');
+    Linking.openURL('mailto:eluminate.co@gmail.com?subject=Support Request');
   };
 
   const handleFAQ = (question: string) => {
@@ -35,7 +35,7 @@ export default function HelpSupportScreen() {
     {
       icon: 'email',
       title: 'Email Support',
-      description: 'support@eluminate.app',
+      description: 'eluminate.co@gmail.com',
       action: handleContactEmail,
     },
   ];

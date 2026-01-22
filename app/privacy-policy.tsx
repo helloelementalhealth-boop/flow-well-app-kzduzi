@@ -50,7 +50,7 @@ export default function PrivacyPolicyScreen() {
     },
     {
       title: 'Contact Us',
-      content: 'If you have any questions about this privacy policy or our data practices, please contact us at privacy@eluminate.app. We are committed to addressing your concerns promptly and transparently.',
+      content: 'If you have any questions about this privacy policy or our data practices, please contact us at eluminate.co@gmail.com. We are committed to addressing your concerns promptly and transparently.',
     },
   ];
 
