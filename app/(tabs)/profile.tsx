@@ -18,12 +18,11 @@ import { IconSymbol } from '@/components/IconSymbol';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
-import { useTheme, useAdminAuth } from '@/contexts/WidgetContext';
+import { useTheme } from '@/contexts/WidgetContext';
 
 export default function ProfileScreen() {
   const colorScheme = useColorScheme();
   const { currentTheme: theme } = useTheme();
-  const { isAdmin } = useAdminAuth();
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
   const [activityData, setActivityData] = useState<any>(null);
@@ -130,8 +129,6 @@ export default function ProfileScreen() {
   const upgradeButtonText = 'Upgrade to Premium';
   const todayActivityTitle = 'Today\'s Activity';
   const settingsTitle = 'Settings';
-  const adminControlText = 'Admin Control';
-  const adminDescriptionText = 'Manage app content and settings';
   const privacyText = 'Privacy Policy';
   const privacyDescriptionText = 'How we protect your data';
   const termsText = 'Terms of Service';
@@ -327,43 +324,6 @@ export default function ProfileScreen() {
                   </Text>
                   <Text style={[styles.settingDescription, { color: theme.textSecondary }]}>
                     {helpDescriptionText}
-                  </Text>
-                </View>
-              </View>
-              <IconSymbol
-                ios_icon_name="chevron-right"
-                android_material_icon_name="chevron-right"
-                size={20}
-                color={theme.textSecondary}
-              />
-            </TouchableOpacity>
-
-            <View style={[styles.divider, { backgroundColor: theme.border }]} />
-
-            <TouchableOpacity
-              style={styles.settingItem}
-              onPress={() => {
-                console.log('[ProfileScreen] User tapped Login/Admin Control');
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                router.push('/admin/');
-              }}
-              activeOpacity={0.7}
-            >
-              <View style={styles.settingLeft}>
-                <View style={[styles.settingIcon, { backgroundColor: theme.error + '20' }]}>
-                  <IconSymbol
-                    ios_icon_name={isAdmin ? 'settings' : 'login'}
-                    android_material_icon_name={isAdmin ? 'settings' : 'login'}
-                    size={20}
-                    color={theme.error}
-                  />
-                </View>
-                <View style={styles.settingTextContainer}>
-                  <Text style={[styles.settingLabel, { color: theme.text }]}>
-                    {isAdmin ? adminControlText : 'Login'}
-                  </Text>
-                  <Text style={[styles.settingDescription, { color: theme.textSecondary }]}>
-                    {isAdmin ? adminDescriptionText : 'Access admin features'}
                   </Text>
                 </View>
               </View>
