@@ -54,10 +54,14 @@ export default function RenewalScreen() {
   const [subscription, setSubscription] = useState<UserSubscription | null>(null);
   const [currentVisual, setCurrentVisual] = useState<RenewalVisual | null>(null);
   const [savedItems, setSavedItems] = useState<SavedRenewalItem[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const loadData = async () => {
     console.log('[Renewal] Loading programs, enrollments, sleep tools, subscription, and visuals');
     setRefreshing(true);
+    setError(null);
+    
     try {
       // Load subscription status
       try {
@@ -76,6 +80,7 @@ export default function RenewalScreen() {
         console.log('[Renewal] Loaded current visual:', visualData.visual_type);
       } catch (error) {
         console.log('[Renewal] Failed to load visual:', error);
+        setCurrentVisual(null);
       }
 
       // Load saved items
@@ -89,14 +94,24 @@ export default function RenewalScreen() {
       }
 
       // Load programs
-      const programsData = await wellnessApi.getPrograms();
-      setPrograms(programsData);
-      console.log('[Renewal] Loaded programs:', programsData.length);
+      try {
+        const programsData = await wellnessApi.getPrograms();
+        setPrograms(programsData);
+        console.log('[Renewal] Loaded programs:', programsData.length);
+      } catch (error) {
+        console.error('[Renewal] Failed to load programs:', error);
+        setPrograms([]);
+      }
 
       // Load sleep tools
-      const toolsData = await sleepApi.getTools();
-      setSleepTools(toolsData);
-      console.log('[Renewal] Loaded sleep tools:', toolsData.length);
+      try {
+        const toolsData = await sleepApi.getTools();
+        setSleepTools(toolsData);
+        console.log('[Renewal] Loaded sleep tools:', toolsData.length);
+      } catch (error) {
+        console.error('[Renewal] Failed to load sleep tools:', error);
+        setSleepTools([]);
+      }
 
       // Try to load enrollments
       try {
@@ -107,13 +122,15 @@ export default function RenewalScreen() {
         console.log('[Renewal] Enrollments not available:', enrollmentError?.message || 'Unknown error');
         setEnrollments([]);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('[Renewal] Failed to load data:', error);
+      setError(error?.message || 'Failed to load renewal data');
       setPrograms([]);
       setSleepTools([]);
       setEnrollments([]);
     } finally {
       setRefreshing(false);
+      setDataLoading(false);
     }
   };
 
@@ -313,6 +330,64 @@ export default function RenewalScreen() {
   const activeEnrollments = enrollments.filter(e => !e.is_completed);
   const activeSavedItems = savedItems.filter(item => !item.is_paused);
   const pausedSavedItems = savedItems.filter(item => item.is_paused);
+
+  // Show loading state
+  if (dataLoading) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top']}>
+        <View style={[styles.header, Platform.OS === 'android' && { paddingTop: 48 }]}>
+          <View>
+            <Text style={[styles.title, { color: theme.text }]}>Renewal</Text>
+            <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
+              Your sanctuary for rest and transformation
+            </Text>
+          </View>
+        </View>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={theme.primary} />
+          <Text style={[styles.loadingText, { color: theme.textSecondary }]}>
+            Loading your renewal space...
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top']}>
+        <View style={[styles.header, Platform.OS === 'android' && { paddingTop: 48 }]}>
+          <View>
+            <Text style={[styles.title, { color: theme.text }]}>Renewal</Text>
+            <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
+              Your sanctuary for rest and transformation
+            </Text>
+          </View>
+        </View>
+        <View style={styles.errorContainer}>
+          <IconSymbol
+            ios_icon_name="error"
+            android_material_icon_name="error"
+            size={48}
+            color={theme.textSecondary}
+          />
+          <Text style={[styles.errorTitle, { color: theme.text }]}>
+            Unable to load Renewal
+          </Text>
+          <Text style={[styles.errorText, { color: theme.textSecondary }]}>
+            {error}
+          </Text>
+          <TouchableOpacity
+            style={[styles.retryButton, { backgroundColor: theme.primary }]}
+            onPress={loadData}
+          >
+            <Text style={styles.retryButtonText}>Try Again</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top']}>
@@ -871,6 +946,46 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 15,
     lineHeight: 22,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 40,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 40,
+  },
+  errorTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginTop: 16,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  errorText: {
+    fontSize: 15,
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 24,
+  },
+  retryButton: {
+    paddingHorizontal: 32,
+    paddingVertical: 12,
+    borderRadius: 12,
+  },
+  retryButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
   },
   scrollView: {
     flex: 1,
