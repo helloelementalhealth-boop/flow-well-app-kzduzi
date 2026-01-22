@@ -30,8 +30,8 @@ export default function TabLayout() {
       label: 'Mindfulness',
     },
     {
-      name: 'sleep',
-      route: '/(tabs)/sleep',
+      name: 'wellness',
+      route: '/(tabs)/wellness',
       icon: 'spa',
       label: 'Wellness',
     },
@@ -56,7 +56,7 @@ export default function TabLayout() {
         <Stack.Screen key="nourishment" name="nourishment" />
         <Stack.Screen key="movement" name="movement" />
         <Stack.Screen key="mindfulness" name="mindfulness" />
-        <Stack.Screen key="sleep" name="sleep" />
+        <Stack.Screen key="wellness" name="wellness" />
         <Stack.Screen key="profile" name="profile" />
       </Stack>
       <FloatingTabBar tabs={tabs} />
