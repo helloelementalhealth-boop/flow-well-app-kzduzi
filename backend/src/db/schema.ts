@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, integer, date, boolean, foreignKey } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, uuid, integer, date, boolean, foreignKey, jsonb } from 'drizzle-orm/pg-core';
 
 // Journal entries table
 export const journalEntries = pgTable('journal_entries', {
@@ -177,4 +177,30 @@ export const sleepTools = pgTable('sleep_tools', {
   is_premium: boolean('is_premium').default(false),
   audio_url: text('audio_url'),
   created_at: timestamp('created_at').notNull().defaultNow(),
+});
+
+// Wellness programs table
+export const wellnessPrograms = pgTable('wellness_programs', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  program_type: text('program_type').notNull(), // stress_relief, energy_reset, gratitude, mindfulness, sleep_mastery, self_compassion
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  duration_days: integer('duration_days').notNull(),
+  is_premium: boolean('is_premium').default(false),
+  daily_activities: jsonb('daily_activities').notNull(), // Array of {day: number, title: string, activity: string}
+  image_url: text('image_url'),
+  created_at: timestamp('created_at').notNull().defaultNow(),
+  updated_at: timestamp('updated_at').notNull().defaultNow(),
+});
+
+// Program enrollments table
+export const programEnrollments = pgTable('program_enrollments', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  user_id: text('user_id').notNull(), // References auth user
+  program_id: uuid('program_id').notNull().references(() => wellnessPrograms.id),
+  enrolled_at: timestamp('enrolled_at').notNull().defaultNow(),
+  current_day: integer('current_day').default(1),
+  completed_days: jsonb('completed_days').default([]), // Array of completed day numbers
+  is_completed: boolean('is_completed').default(false),
+  completed_at: timestamp('completed_at'),
 });
