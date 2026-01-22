@@ -468,3 +468,66 @@ export const wellnessApi = {
     });
   },
 };
+
+// Subscription API
+export interface UserSubscription {
+  user_id: string;
+  subscription_tier: 'free' | 'premium' | 'lifetime';
+  is_active: boolean;
+  expires_at?: string;
+}
+
+export const subscriptionApi = {
+  async getStatus(): Promise<UserSubscription> {
+    return apiCall<UserSubscription>('/api/subscriptions/status', { method: 'GET' });
+  },
+  async activate(tier: 'premium' | 'lifetime'): Promise<UserSubscription> {
+    return apiCall<UserSubscription>('/api/subscriptions/activate', {
+      method: 'POST',
+      body: JSON.stringify({ tier }),
+    });
+  },
+};
+
+// Renewal API
+export interface RenewalVisual {
+  id: string;
+  visual_type: 'daily' | 'monthly' | 'seasonal';
+  image_url: string;
+  description: string;
+}
+
+export interface SavedRenewalItem {
+  id: string;
+  item_type: 'program' | 'ritual' | 'tool';
+  item_id: string;
+  is_paused: boolean;
+  saved_at: string;
+}
+
+export const renewalApi = {
+  async getCurrentVisual(): Promise<RenewalVisual> {
+    return apiCall<RenewalVisual>('/api/renewal/visuals/current', { method: 'GET' });
+  },
+  async getSavedItems(): Promise<SavedRenewalItem[]> {
+    return apiCall<SavedRenewalItem[]>('/api/renewal/saved-items', { method: 'GET' });
+  },
+  async saveItem(itemType: 'program' | 'ritual' | 'tool', itemId: string): Promise<SavedRenewalItem> {
+    return apiCall<SavedRenewalItem>('/api/renewal/saved-items', {
+      method: 'POST',
+      body: JSON.stringify({ item_type: itemType, item_id: itemId }),
+    });
+  },
+  async pauseItem(id: string, isPaused: boolean): Promise<SavedRenewalItem> {
+    return apiCall<SavedRenewalItem>(`/api/renewal/saved-items/${id}/pause`, {
+      method: 'PUT',
+      body: JSON.stringify({ is_paused: isPaused }),
+    });
+  },
+  async removeSavedItem(id: string): Promise<{ success: boolean }> {
+    return apiCall<{ success: boolean }>(`/api/renewal/saved-items/${id}`, {
+      method: 'DELETE',
+      body: JSON.stringify({}),
+    });
+  },
+};
