@@ -489,41 +489,4 @@ export const subscriptionApi = {
   },
 };
 
-// Insights API
-export interface TrendingProgram {
-  id: string;
-  title: string;
-  category: string;
-  participants: number;
-  growth: number;
-  icon: string;
-  color: string;
-}
-
-export interface CommunityInsight {
-  id: string;
-  title: string;
-  description: string;
-  type: 'tip' | 'stat' | 'recommendation';
-}
-
-export interface InsightsStats {
-  total_active_users: number;
-  most_popular_time: string;
-  completion_rate: number;
-  trending_categories: string[];
-}
-
-export const insightsApi = {
-  async getTrending(): Promise<TrendingProgram[]> {
-    return apiCall<TrendingProgram[]>('/api/insights/trending', { method: 'GET' });
-  },
-  async getCommunityInsights(): Promise<CommunityInsight[]> {
-    return apiCall<CommunityInsight[]>('/api/insights/community', { method: 'GET' });
-  },
-  async getStats(): Promise<InsightsStats> {
-    return apiCall<InsightsStats>('/api/insights/stats', { method: 'GET' });
-  },
-};
-
 
