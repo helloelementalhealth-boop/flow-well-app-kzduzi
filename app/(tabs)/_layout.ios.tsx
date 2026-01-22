@@ -17,7 +17,6 @@ export default function TabLayout() {
         <Stack.Screen key="nourishment" name="nourishment" />
         <Stack.Screen key="movement" name="movement" />
         <Stack.Screen key="mindfulness" name="mindfulness" />
-        <Stack.Screen key="renewal" name="renewal" />
         <Stack.Screen key="profile" name="profile" />
       </Stack>
       
@@ -37,10 +36,6 @@ export default function TabLayout() {
         <NativeTabs.Trigger name="mindfulness">
           <Label>Mindfulness</Label>
           <Icon sf={{ default: 'brain.head.profile', selected: 'brain.head.profile.fill' }} drawable="self-improvement" />
-        </NativeTabs.Trigger>
-        <NativeTabs.Trigger name="renewal">
-          <Label>Renewal</Label>
-          <Icon sf={{ default: 'sparkles', selected: 'sparkles' }} drawable="spa" />
         </NativeTabs.Trigger>
         <NativeTabs.Trigger name="profile">
           <Label>Profile</Label>
