@@ -205,35 +205,3 @@ export const programEnrollments = pgTable('program_enrollments', {
   completed_at: timestamp('completed_at'),
 });
 
-// User subscriptions table
-export const userSubscriptions = pgTable('user_subscriptions', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  user_id: text('user_id').notNull(), // References auth user
-  subscription_tier: text('subscription_tier').notNull().default('free'), // free, premium, lifetime
-  is_active: boolean('is_active').default(false),
-  started_at: timestamp('started_at'),
-  expires_at: timestamp('expires_at'), // nullable for lifetime subscriptions
-  created_at: timestamp('created_at').notNull().defaultNow(),
-});
-
-// Renewal visuals table (rotating content based on date)
-export const renewalVisuals = pgTable('renewal_visuals', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  visual_type: text('visual_type').notNull(), // daily, monthly, seasonal
-  day_of_week: integer('day_of_week'), // 0-6 for Sunday-Saturday (for daily visuals)
-  month: integer('month'), // 1-12 (for monthly visuals)
-  season: text('season'), // spring, summer, fall, winter (for seasonal visuals)
-  image_url: text('image_url').notNull(),
-  description: text('description'),
-  created_at: timestamp('created_at').notNull().defaultNow(),
-});
-
-// Saved renewal items table
-export const savedRenewalItems = pgTable('saved_renewal_items', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  user_id: text('user_id').notNull(), // References auth user
-  item_type: text('item_type').notNull(), // program, ritual, tool
-  item_id: uuid('item_id').notNull(),
-  is_paused: boolean('is_paused').default(false),
-  saved_at: timestamp('saved_at').notNull().defaultNow(),
-});
